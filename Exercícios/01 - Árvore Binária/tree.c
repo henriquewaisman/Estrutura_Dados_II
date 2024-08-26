@@ -77,6 +77,8 @@ bool findNode(node * root, int data){
   }
 }
 
+//TODO: Delete Note
+
 int main(void) {
   node *root = NULL;
   insertNode(&root, 15);
