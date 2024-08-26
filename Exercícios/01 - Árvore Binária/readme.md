@@ -7,7 +7,7 @@
 </br>
 
 ## Exercise 1
-* Create in C language the structure of a binary tree which the "data" may be an integer.
+* Create in C language the structure of a binary tree which the "data" is an integer.
 * Write down functions that recieve a pointer to the root of the tree and do:
     - Insertion of an element in the tree;
     - Search of an element in the tree;
