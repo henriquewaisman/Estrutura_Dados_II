@@ -2,15 +2,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+//Criação da estrutura do nó com um dado inteiro, um filho na esquerda e outro na direita.
 typedef struct node {
   int data;
   struct node *left;
   struct node *right;
 } node;
 
+//Cria um nó alocando espaço na memória. 
 node *createTree(int data) {
   node *newNode = malloc(sizeof(node));
   if (newNode != NULL) {
+    //setra os filhos do nó como nulos e o dado é o parâmetro da função.
     newNode->left = NULL;
     newNode->right = NULL;
     newNode->data = data;
@@ -18,12 +21,14 @@ node *createTree(int data) {
   return newNode;
 }
 
+//printa os níveis da árvore
 void printTabs(int numtabs) {
   for (int i = 0; i < numtabs; i++) {
     printf("\t");
   }
 }
 
+//printa a árvore por níveis
 void printTree_Rec(node *root, int level) {
   if (root == NULL) {
     printTabs(level);
@@ -42,36 +47,48 @@ void printTree_Rec(node *root, int level) {
   printf("done\n");
 }
 
+//printa a ávore recursivamente
 void printTree(node* root){
   printTree_Rec(root, 0);
 }
 
+//Função para inserir nós na árvore.
 bool insertNode(node **rootptr, int data){
-  node *root = *rootptr;
+  node *root = *rootptr; 
+  //insere o nó caso a raíz da sub-árvore atual seja nula. 
   if (root == NULL) {
     (*rootptr) = createTree(data);
     return true;
   }
+  //caso o valor do nó já exista, retorna falso, visto que o 2 nós não podem ter o mesmo dado.  
   if (data == root->data) {
     return false;
   }
+  //caso o dado inserido seja menor que a raíz da sub-árovre atual, caminha para a esquerda.
   if (data < root->data) {
     return insertNode(&(root->left), data);
-  } else {
+  } 
+  //caso contrártio (o dado seja maior que a raiz atual), caminha para a direita.
+  else {
     return insertNode(&(root->right), data);
   }
 }
 
+//Função para achar um nó na árvore.
 bool findNode(node * root, int data){
+  //caso a raiz da sub-árvore atual for nulo, retorna falso, pois o mesmo não foi achado
   if(root == NULL){
     return false;
   }
+  //caso o valor da raíz da sub-árovre atual seja igual ao valor procurado, retorna verdadeiro, o valor foi encontrado!
   if(root->data == data){
     return true;
   }
+  //caso o dado seja menor que a raíz da sub-árovre atual, caminha para a esquerda
   if(data < root->data){
     return findNode(root->left, data);
   }
+  //caso o dado seja maior que a raíz da sub-árovre atual, caminha para a direita
   else{
     return findNode(root->right, data);
   }
