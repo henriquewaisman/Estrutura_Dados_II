@@ -77,9 +77,8 @@ bool findNode(node * root, int data){
   }
 }
 
-//TODO: Delete Note
-node* findMin(node* root) {
-    while (root->left != NULL) {
+node* findMin(node* root){
+    while(root->left != NULL){
         root = root->left;
     }
     return root;
@@ -87,31 +86,31 @@ node* findMin(node* root) {
 
 bool removeNode(node **rootptr, int data) {
     node *root = *rootptr;
-    if (root == NULL) {
+    if(root == NULL){
         return false;
     }
-    if (data < root->data) {
+    if(data < root->data){
         return removeNode(&(root->left), data);
-    } else if (data > root->data) {
+    }
+    else if(data > root->data){
         return removeNode(&(root->right), data);
-    } else {
-        // Node with the data found
-        if (root->left == NULL && root->right == NULL) {
-            // Case 1: Node has no children (leaf node)
+    } 
+    else{
+        if(root->left == NULL && root->right == NULL){
             free(root);
             *rootptr = NULL;
-        } else if (root->left == NULL) {
-            // Case 2: Node has only right child
+        } 
+        else if(root->left == NULL){
             node *temp = root->right;
             free(root);
             *rootptr = temp;
-        } else if (root->right == NULL) {
-            // Case 2: Node has only left child
+        } 
+        else if(root->right == NULL){
             node *temp = root->left;
             free(root);
             *rootptr = temp;
-        } else {
-            // Case 3: Node has two children
+        }
+        else{
             node *temp = findMin(root->right);
             root->data = temp->data;
             return removeNode(&(root->right), temp->data);
