@@ -35,6 +35,13 @@ bool insertNode(node **rootptr, int data){
   }
 }
 
+//TODO: iterative pre order
+
+//TODO: iterative post order
+
+//TODO: iterative in order 
+
+
 int main(void) {
   node *root = NULL;
   insertNode(&root, 15);
