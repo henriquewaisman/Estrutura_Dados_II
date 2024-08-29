@@ -13,7 +13,7 @@ typedef struct node {
 node *createTree(int data) {
   node *newNode = malloc(sizeof(node));
   if (newNode != NULL) {
-    //setra os filhos do nó como nulos e o dado é o parâmetro da função.
+    //seta os filhos do nó como nulos e o dado é o parâmetro de entrada da função.
     newNode->left = NULL;
     newNode->right = NULL;
     newNode->data = data;
@@ -54,8 +54,9 @@ void printTree(node* root){
 
 //Função para inserir nós na árvore.
 bool insertNode(node **rootptr, int data){
+  //seta um ponteiro que aponta para a raiz, que também é um ponteiro
   node *root = *rootptr; 
-  //insere o nó caso a raíz da sub-árvore atual seja nula. 
+  //caso a raíz da sub-árvore atual seja nula, crie o nó. 
   if (root == NULL) {
     (*rootptr) = createTree(data);
     return true;
@@ -76,11 +77,11 @@ bool insertNode(node **rootptr, int data){
 
 //Função para achar um nó na árvore.
 bool findNode(node * root, int data){
-  //caso a raiz da sub-árvore atual for nulo, retorna falso, pois o mesmo não foi achado
+  //caso a raiz da sub-árvore atual for nulo, retorna falso (0), pois o mesmo não foi achado
   if(root == NULL){
     return false;
   }
-  //caso o valor da raíz da sub-árovre atual seja igual ao valor procurado, retorna verdadeiro, o valor foi encontrado!
+  //caso o valor da raíz da sub-árovre atual seja igual ao valor procurado, retorna verdadeiro (1), o valor foi encontrado!
   if(root->data == data){
     return true;
   }
@@ -94,43 +95,55 @@ bool findNode(node * root, int data){
   }
 }
 
+//acha o menor nó da árvore (o nó mais a esquerda)
 node* findMin(node* root){
+    //enquanto houver nó na esquerda, caminhe para a esquerda
     while(root->left != NULL){
         root = root->left;
     }
+    //quando o filho da esquerda for nulo, retorne o nó, visto que o menor nó foi encontrado
     return root;
 }
 
+//Função para remover o nó
 bool removeNode(node **rootptr, int data) {
+    //seta o ponteiro da raiz
     node *root = *rootptr;
+    //caso a raiz atual seja nula, retorna falso, visto que o nó a ser apagado nã existe
     if(root == NULL){
         return false;
     }
+    //caminha pela árvore para achar o nó:
     if(data < root->data){
         return removeNode(&(root->left), data);
     }
     else if(data > root->data){
         return removeNode(&(root->right), data);
     } 
+    //quando o nó for achado faça:    
     else{
+        //caso o nó não tenha filhos, libere a memória e sete o nó como nulo
         if(root->left == NULL && root->right == NULL){
             free(root);
             *rootptr = NULL;
         } 
-        else if(root->left == NULL){
-            node *temp = root->right;
-            free(root);
-            *rootptr = temp;
+        //caso o nó tenha apenas um filho na direita:
+        else if(root->left == NULL){ 
+            node *temp = root->right; //armazena o filho da direita em um ponteiro temporário
+            free(root); //libera a raiz
+            *rootptr = temp; //seta a raiz como o filho da direita, que estava armezanado no ponteiro temporário
         } 
+        //caso o nó tenha apenas um filho na esquerda:
         else if(root->right == NULL){
-            node *temp = root->left;
-            free(root);
-            *rootptr = temp;
+            node *temp = root->left; //armazena o filho da esquerda em um ponteiro temporário
+            free(root); //libera a raiz
+            *rootptr = temp; //seta a raiz como o filho da esquerda, que estava armezanado no ponteiro temporário
         }
         else{
-            node *temp = findMin(root->right);
-            root->data = temp->data;
-            return removeNode(&(root->right), temp->data);
+            //caso o nó tenha ambos os filhos:
+            node *temp = findMin(root->right); //acha o menor filho da sub-árvore da direita e armazena em um ponteiro temporário 
+            root->data = temp->data; //seta o dado da raiz como o dado armazenado no nó temporário 
+            return removeNode(&(root->right), temp->data); //apaga o nó substituido
         }
         return true;
     }
@@ -138,6 +151,7 @@ bool removeNode(node **rootptr, int data) {
 
 
 int main(void) {
+  //criando a árvore
   node *root = NULL;
   insertNode(&root, 15);
   insertNode(&root, 11);
@@ -146,15 +160,16 @@ int main(void) {
   insertNode(&root, 19);
   insertNode(&root, 16);
 
-  printTree(root);
+  printTree(root); //printando a árvore
 
+  //achando nós a partir de seus dados, retorna 1 caso o valor seja achado, 0 caso não for achado
   printf("%d (%d)\n", 16, findNode(root, 16));
   printf("%d (%d)\n", 15, findNode(root, 15));
   printf("%d (%d)\n", 55, findNode(root, 55));
   printf("%d (%d)\n", 166, findNode(root, 166));
-  
-  removeNode(&root, 16);
-  printTree(root);
-  printf("%d (%d)\n", 16, findNode(root, 16));
+
+  removeNode(&root, 16); //remove um nó existente
+  printTree(root); //printa a árvore sem o nó removido
+  printf("%d (%d)\n", 16, findNode(root, 16)); //função para achar o nó, antes retorna 1 (pois o nó se encontrava na árvore), agora retorna 0 (pois o nó foi excluido)
   return 0;
 }
