@@ -21,37 +21,6 @@ node *createTree(int data) {
   return newNode;
 }
 
-//printa os níveis da árvore
-void printTabs(int numtabs) {
-  for (int i = 0; i < numtabs; i++) {
-    printf("\t");
-  }
-}
-
-//printa a árvore por níveis
-void printTree_Rec(node *root, int level) {
-  if (root == NULL) {
-    printTabs(level);
-    printf("--<empty>--\n");
-    return;
-  }
-  printTabs(level);
-  printf("data = %d\n", root->data);
-  printTabs(level);
-  printf("left\n");
-  printTree_Rec(root->left, level + 1);
-  printTabs(level);
-  printf("right\n");
-  printTree_Rec(root->right, level +1);
-  printTabs(level);
-  printf("done\n");
-}
-
-//printa a ávore recursivamente
-void printTree(node* root){
-  printTree_Rec(root, 0);
-}
-
 //Função para inserir nós na árvore.
 bool insertNode(node **rootptr, int data){
   //seta um ponteiro que aponta para a raiz, que também é um ponteiro
@@ -113,10 +82,11 @@ bool removeNode(node **rootptr, int data) {
     if(root == NULL){
         return false;
     }
-    //caminha pela árvore para achar o nó:
+    //caso o dado seja menor que a raiz atual, caminha para a esquerda
     if(data < root->data){
         return removeNode(&(root->left), data);
     }
+    //caso o dado seja maior que a raiz atual, caminha para a direita
     else if(data > root->data){
         return removeNode(&(root->right), data);
     } 
@@ -149,6 +119,36 @@ bool removeNode(node **rootptr, int data) {
     }
 }
 
+//printa os níveis da árvore
+void printTabs(int numtabs) {
+  for (int i = 0; i < numtabs; i++) {
+    printf("\t");
+  }
+}
+
+//printa a árvore por níveis
+void printTree_Rec(node *root, int level) {
+  if (root == NULL) {
+    printTabs(level);
+    printf("--<empty>--\n");
+    return;
+  }
+  printTabs(level);
+  printf("data = %d\n", root->data);
+  printTabs(level);
+  printf("left\n");
+  printTree_Rec(root->left, level + 1);
+  printTabs(level);
+  printf("right\n");
+  printTree_Rec(root->right, level +1);
+  printTabs(level);
+  printf("done\n");
+}
+
+//printa a ávore recursivamente
+void printTree(node* root){
+  printTree_Rec(root, 0);
+}
 
 int main(void) {
   //criando a árvore
