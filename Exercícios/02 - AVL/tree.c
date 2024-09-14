@@ -2,23 +2,35 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-//Criação da estrutura do nó com um dado inteiro, um filho na esquerda e outro na direita.
+//Criação da estrutura do nó com um dado inteiro, um filho na esquerda, um filho na direita e uma altura inteira.
 typedef struct node {
   int data;
   struct node *left;
   struct node *right;
+  int height;
 } node;
 
 //Cria um nó alocando espaço na memória. 
 node *createTree(int data) {
   node *newNode = malloc(sizeof(node));
   if (newNode != NULL) {
-    //seta os filhos do nó como nulos e o dado é o parâmetro de entrada da função.
+    //seta os filhos do nó como nulos, sua altura como 0 e o dado é o parâmetro de entrada da função.
     newNode->left = NULL;
     newNode->right = NULL;
     newNode->data = data;
+    newNode->height = 0;
   }
   return newNode;
+}
+
+//Checa a altura do nó
+int checkHeight(node *node){
+    //Caso o nó seja nulo, sua altura é -1
+    if (node == NULL){
+        return -1;    
+    }
+    //Retorna a checkHeight do nó
+    return node->height; 
 }
 
 //Função para inserir nós na árvore.
@@ -38,10 +50,20 @@ bool insertNode(node **rootptr, int data){
   if (data < root->data) {
     return insertNode(&(root->left), data);
   } 
-  //caso contrártio (o dado seja maior que a raiz atual), caminha para a direita.
+  //caso contrártio (o dado seja maior que a raiz atual), caminha para a direta.
   else {
     return insertNode(&(root->right), data);
   }
+}
+
+//Calcula do fator de balanceamento do nó
+int balanceFactor(node *node){
+    //Se o nó for nulo, seu fator é 0
+    if(node == NULL){
+        return 0;
+    }
+    //caso não seja nulo, calcula o fator: altura da esquerda - altura da direita
+    return checkHeight(node->left) - checkHeight(node->right);
 }
 
 //Função para achar um nó na árvore.
@@ -101,22 +123,87 @@ bool removeNode(node **rootptr, int data) {
         else if(root->left == NULL){ 
             node *temp = root->right; //armazena o filho da direita em um ponteiro temporário
             free(root); //libera a raiz
-            *rootptr = temp; //seta a raiz como o filho da direita, que estava armezanado no ponteiro temporário
+            *rootptr = temp; //seta a raiz como o filho da direita, que estava armezanado node ponteiro temporário
         } 
         //caso o nó tenha apenas um filho na esquerda:
         else if(root->right == NULL){
             node *temp = root->left; //armazena o filho da esquerda em um ponteiro temporário
             free(root); //libera a raiz
-            *rootptr = temp; //seta a raiz como o filho da esquerda, que estava armezanado no ponteiro temporário
+            *rootptr = temp; //seta a raiz como o filho da esquerda, que estava armezanado node ponteiro temporário
         }
         else{
             //caso o nó tenha ambos os filhos:
             node *temp = findMin(root->right); //acha o menor filho da sub-árvore da direita e armazena em um ponteiro temporário 
-            root->data = temp->data; //seta o dado da raiz como o dado armazenado no nó temporário 
+            root->data = temp->data; //seta o dado da raiz como o dado armazenado node nó temporário 
             return removeNode(&(root->right), temp->data); //apaga o nó substituido
         }
         return true;
     }
+}
+
+struct node *rightRotation(struct node *node){
+    struct node *newRoot = node->left;      
+    struct node *subTree = newRoot->right;
+    newRoot->right = node;   
+    node->left = subTree; 
+    if (checkHeight(node->left) > checkHeight(node->right)){
+        node->height = 1 + checkHeight(node->left);    
+    }
+    else{
+        node->height = 1 + checkHeight(node->right);
+    }
+    if (checkHeight(newRoot->left) > checkHeight(newRoot->right)){
+        newRoot->height = 1 + checkHeight(newRoot->left);
+    }
+    else{
+        newRoot->height = 1 + checkHeight(newRoot->right); 
+    }
+    return newRoot; 
+}
+
+struct node *leftRotation(struct node *node){
+    struct node *newRoot = node->right;
+    struct node *subTree = newRoot->left;
+    newRoot->left = node; 
+    node->right = subTree; 
+    if (checkHeight(node->left) > checkHeight(node->right))
+        node->height = 1 + checkHeight(node->left);     
+    else
+        node->height = 1 + checkHeight(node->right); 
+
+    if (checkHeight(newRoot->left) > checkHeight(newRoot->right)) 
+        newRoot->height = 1 + checkHeight(newRoot->left);     
+    else
+        newRoot->height = 1 + checkHeight(newRoot->right); 
+    return newRoot; 
+}
+
+struct node *balance(struct node *root, int data){
+    if (root == NULL){
+        return root;
+    }
+    if (checkHeight(root->left) > checkHeight(root->right)){
+        root->height = 1 + checkHeight(root->left);
+    }
+    else{
+        root->height = 1 + checkHeight(root->right);
+    }
+    int balance = balanceFactor(root);
+    if (balance > 1 && data < root->left->data){
+        return rightRotation(root); 
+    }
+    if (balance < -1 && data > root->right->data){
+        return leftRotation(root);             
+    }
+    if (balance > 1 && data > root->left->data){
+        root->left = leftRotation(root->left); 
+        return rightRotation(root);
+    }
+    if (balance < -1 && data < root->right->data){
+        root->right = rightRotation(root->right); 
+        return leftRotation(root);                  
+    }
+    return root; 
 }
 
 //printa os níveis da árvore
@@ -134,7 +221,7 @@ void printTree_Rec(node *root, int level) {
     return;
   }
   printTabs(level);
-  printf("data = %d\n", root->data);
+  printf("data = %d, balance factor = %d\n", root->data, balanceFactor(root));
   printTabs(level);
   printf("left\n");
   printTree_Rec(root->left, level + 1);
@@ -161,15 +248,7 @@ int main(void) {
   insertNode(&root, 16);
 
   printTree(root); //printando a árvore
-
-  //achando nós a partir de seus dados, retorna 1 caso o valor seja achado, 0 caso não for achado
-  printf("%d (%d)\n", 16, findNode(root, 16));
-  printf("%d (%d)\n", 15, findNode(root, 15));
-  printf("%d (%d)\n", 55, findNode(root, 55));
-  printf("%d (%d)\n", 166, findNode(root, 166));
-
-  removeNode(&root, 16); //remove um nó existente
-  printTree(root); //printa a árvore sem o nó removido
-  printf("%d (%d)\n", 16, findNode(root, 16)); //função para achar o nó, antes retorna 1 (pois o nó se encontrava na árvore), agora retorna 0 (pois o nó foi excluido)
+  
+  
   return 0;
 }
